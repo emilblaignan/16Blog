@@ -1,0 +1,14 @@
+---
+title: "Blog"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  sort-ui: true
+  filter-ui: true
+page-layout: full
+title-block-banner: true
+---
+
+Welcome to my blog! Here you'll find posts about my thoughts, projects, and whatever else I'm currently exploring.

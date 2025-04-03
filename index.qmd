@@ -1,0 +1,25 @@
+---
+title: "Emil Blaignan"
+about:
+  template: trestles
+  image: profile.jpg
+  image-width: 200px
+  image-shape: rounded
+  links:
+    - icon: github
+      text: GitHub
+      href: https://github.com/emilblaignan
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/emil-blaignan
+---
+
+## About Me
+
+Hi, I am a third-year undergraduate student at UCLA majoring in Mathematics/Economics B.S. with a specialization in Computing. My academic interests focus on quantitative finance (fixed-income breadth), machine learning applications in economics, and numerical optimization. I have also worked on projects involving time-series forecasting of Treasury yields, portfolio optimization/risk, and econometric analysis of monetary policy. See the [Projects](projects.qmd) section for more details. I am particularly interested in fixed-income analysis and portfolio management and am keen to see how financial mathematics and deep learning can improve these areas.
+
+Outside academics, I enjoy photography, hiking, music production, and movies. See the [Personal](personal.qmd) section for more details.
+
+## Contact
+
+Feel free to reach out via [email](mailto:emilblaignan@gmail.com).

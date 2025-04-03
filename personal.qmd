@@ -1,0 +1,57 @@
+---
+title: "Personal"
+image: profile.jpg
+about:
+  template: jolla
+---
+
+::: {style="text-align: left;"}
+Outside of mathematics, I enjoy photography, hiking, music production, and movies. I'm constantly seeking new trails to explore around Los Angeles, experimenting with various synthesizers, and logging movies into my Letterboxd. When not crunching numbers, you'll find me perfecting my landscape shots, crafting new beats, hiking on the weekends, or in the theater watching the latest A24 film.
+
+Below are a few pictures!
+
+# Hiking
+
+::: {layout="[1,1,1]"}
+
+![](IMG_2561.jpeg)
+
+![](IMG_2566.jpeg)
+
+![](IMG_2583.jpeg)
+:::
+
+These photos are from Cactus to Clouds, one of the hardest day hikes in the U.S. My roommate Kai and I started in Palm Springs at 3 AM and reached San Jacinto Peak around 5 PM. The hike took us 14 hours, covering 21 miles with 10,300 feet of elevation gain.
+
+![Source: HikingGuy.com](cactus-to-clouds-sections.jpg)
+
+# Photography
+
+::: {layout="[[1,1],[1,1]]"}
+
+![](IMG_3717.jpg)
+
+![](IMG_3709.jpg)
+
+![](IMG_2885.jpg)
+
+![](IMG_4826.jpeg)
+:::
+
+Above are two photos I took at the 2021 French GP when Max Verstappen won. I love Formula 1, so obviously when I had the chance to go to a race I brought my camera and took lots of photos. 
+
+Below are a couple of examples of my long exposure/light painting photography. If there were one photography niche that would be my favorite, it would be this. I love all types of long exposures and light painting only allowed me to be even more creative.
+
+# Favorite Films
+
+::: {layout="[1,1,1]"}
+
+![](GS_OLD_KEYART_DIGITAL_FIN01.width-800.jpg)
+
+![](H20672-L129598470.jpg)
+
+![](MV5BMTUxNzc0OTIxMV5BMl5BanBnXkFtZTgwNDI3NzU2NDE@._V1_.jpg)
+:::
+
+:::
+

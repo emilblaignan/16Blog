@@ -1,0 +1,29 @@
+project:
+  type: website
+  output-dir: docs  # Important for GitHub Pages
+
+website:
+  title: "Emil Blaignan"  # Change to your actual name
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: blog/index.qmd
+        text: Blog
+      - href: projects.qmd
+        text: Projects
+      - href: cv.qmd
+        text: CV
+      - personal.qmd
+    right:
+      - icon: github
+        href: https://github.com/emilblaignan  
+      - icon: linkedin
+        href: https://www.linkedin.com/in/emil-blaignan/  
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    css: styles.css

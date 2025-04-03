@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: fede0add-402d-4085-b8cf-3ed3d479f15c
+      url: https://emilblaignan.quarto.pub/16blog

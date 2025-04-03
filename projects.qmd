@@ -1,0 +1,141 @@
+---
+title: "Projects"
+page-layout: full
+title-block-banner: true
+---
+
+<style>
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3a0ca3;
+  --accent-color: #f72585;
+  --light-bg: #f8f9fa;
+  --dark-text: #2b2d42;
+  --light-text: #8d99ae;
+}
+
+.card {
+  transition: all 0.3s ease;
+  margin-bottom: 25px;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  background-color: white;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+.card-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1.2rem;
+  text-align: center;
+  border-bottom: none;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.8rem;
+  text-align: center;
+}
+
+.card-body img {
+  width: 220px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 1.2rem;
+  object-fit: cover;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tag {
+  display: inline-block;
+  background-color: var(--light-bg);
+  color: var(--secondary-color);
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0 4px 8px;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  background-color: var(--secondary-color);
+  color: white;
+  transform: scale(1.05);
+}
+
+.card-body p {
+  color: var(--dark-text);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 1.2rem 0;
+}
+
+.btn-dark {
+  padding: 0.7rem 2.2rem;
+  background-color: var(--dark-text);
+  border: none;
+  border-radius: 30px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.btn-dark:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(58, 12, 163, 0.2);
+}
+
+.card-footer {
+  text-align: right;
+  color: var(--light-text);
+  font-size: 0.8rem;
+  padding: 0.8rem 1.5rem;
+  background-color: rgba(248, 249, 250, 0.7);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+</style>
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-6 .g-col-lg-4}
+::: {.card}
+::: {.card-header}
+## Yield Curve Forecaster
+:::
+::: {.card-body}
+![](dashapp.png){fig-align="center"}
+
+::: {style="margin: 15px 0 20px;"}
+<span class="tag">PYTHON</span>
+<span class="tag">SQL</span>
+<span class="tag">NSS/AFNS</span>
+:::
+
+A quantitative fixed-income analytics toolkit for visualizing, forecasting, and analyzing treasury yields.
+
+::: {style="margin-top: 25px;"}
+[GitHub](https://github.com/emilblaignan/YieldCurveForecaster){.btn .btn-dark target="_blank" rel="noopener noreferrer"}
+:::
+:::
+::: {.card-footer}
+March 20<sup>th</sup>, 2025
+:::
+:::
+:::
+
+<!-- You can add more cards here in the same pattern -->
+
+:::
