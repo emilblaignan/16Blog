@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: docs  # Important for GitHub Pages
+  resources:
+    - data/portfolio-performance.json
 
 website:
   title: "Emil Blaignan"  # Change to your actual name
@@ -12,6 +14,8 @@ website:
         text: Blog
       - href: projects.qmd
         text: Projects
+      - href: portfolio.qmd
+        text: Portfolio
       - href: cv.qmd
         text: CV
       - personal.qmd

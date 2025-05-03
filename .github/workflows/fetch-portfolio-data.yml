@@ -1,0 +1,38 @@
+name: Fetch Portfolio Data
+
+on:
+  schedule:
+    - cron: '30 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install yfinance pandas pandas-datareader numpy
+          
+      - name: Run data fetch script
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python .github/scripts/fetch_portfolio_data.py
+        
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add data/portfolio-performance.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update portfolio data [skip ci]"
+          git push

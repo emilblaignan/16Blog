@@ -1,0 +1,739 @@
+---
+title: "Portfolio Performance Analysis"
+page-layout: full
+title-block-banner: true
+---
+
+<style>
+:root {
+  --primary-color: #4361ee;
+  --secondary-color: #3a0ca3;
+  --accent-color: #f72585;
+  --light-bg: #f8f9fa;
+  --dark-text: #2b2d42;
+  --light-text: #8d99ae;
+  --positive-color: #28a745;
+  --negative-color: #dc3545;
+}
+
+.performance-container {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  background-color: white;
+  padding: 20px;
+  margin: 30px 0;
+}
+
+.chart-container {
+  width: 100% !important;
+  margin: 20px 0 30px;
+  padding: 0;
+}
+
+#alpha-chart, #ytd-chart {
+  width: 100% !important;
+  height: 500px !important; 
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--light-text);
+  font-style: italic;
+}
+
+.error-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--negative-color);
+  font-style: italic;
+}
+
+.data-info {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--light-text);
+  margin-top: 10px;
+  position: relative;
+  z-index: 10;
+}
+
+.performance-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 30px;
+  position: relative;
+  z-index: 20;
+}
+
+.metric-card {
+  text-align: center;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: white;
+  position: relative;
+  z-index: 25;
+  overflow: visible;
+}
+
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: var(--light-text);
+  margin-bottom: 5px;
+}
+
+.metric-description {
+  font-size: 0.75rem;
+  color: var(--light-text);
+  opacity: 0.8;
+}
+
+.positive {
+  color: var(--positive-color);
+}
+
+.negative {
+  color: var(--negative-color);
+}
+
+.chart-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+  position: relative;
+  z-index: 30;
+}
+
+.chart-tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.chart-tab.active {
+  border-bottom: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.holdings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+.holdings-table th {
+  background-color: var(--light-bg);
+  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--dark-text);
+}
+
+.holdings-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+@media (max-width: 768px) {
+  .performance-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+This visualization provides a year-to-date analysis of my actively managed investment portfolio's performance, comparing it to the S&P 500 benchmark (SPY).\n
+Portfolio metrics are computed based on a non-annualized framework.
+
+*Note: The data is updated daily via an automated GitHub Action.*
+
+<div class="performance-container">
+<div class="chart-tabs">
+<div class="chart-tab active" id="tab-ytd">YTD Performance</div>
+<div class="chart-tab" id="tab-risk">Risk Analysis</div>
+<div class="chart-tab" id="tab-alpha">Alpha Evolution</div>
+</div>
+
+<div id="ytd-chart" class="chart-container" style="height: 500px;">
+<div class="loading-message"></div>
+</div>
+  
+<div id="risk-chart" class="chart-container" style="height: 400px; display: none;">
+<div class="loading-message">Loading risk analysis...</div>
+</div>
+
+<div id="alpha-chart" class="chart-container" style="height: 500px; display: none;">
+<div class="loading-message"></div>
+</div>
+
+<div class="metrics-note" style="font-size: 0.8rem; color: var(--light-text); font-style: italic; opacity: 0.9; margin: 5px 0 20px; text-align: center; display: none;" id="alpha-note">
+  Note: Rolling metrics shown in this chart use 20-day windows and will differ from the YTD cumulative metrics displayed in the summary cards below.
+</div>
+  
+<div class="performance-metrics" id="performance-metrics">
+<!-- Metrics will be inserted here -->
+</div>
+  
+<div id="data-info" class="data-info"></div>
+  
+<div id="holdings-table-container">
+<!-- Holdings table will be inserted here -->
+</div>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.7/dayjs.min.js"></script>
+
+<script>
+// Configuration parameters
+const CONFIG = {
+  rollingWindow: 20,  // Number of days for rolling window calculations
+  tradingDays: 252    // Trading days in a year 
+};
+
+// Main analysis function
+async function analyzePortfolio() {
+  try {
+    // 1. Load data
+    const response = await fetch('data/portfolio-performance.json');
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    const data = await response.json();
+    
+    console.log("Data loaded successfully:", data);
+    
+    // 2. Calculate daily returns from YTD percentages
+    const portfolioReturns = calculateDailyReturnsFromYTD(data.timeSeriesData.portfolio);
+    const benchmarkReturns = calculateDailyReturnsFromYTD(data.timeSeriesData.benchmark);
+    
+    // 3. Extract SOFR rates and convert to decimal
+    const sofrRates = data.timeSeriesData.sofr_rates_pct.map(rate => rate / 100);
+    
+    // 4. Calculate metrics
+    const metrics = calculateFinancialMetrics(
+      portfolioReturns, 
+      benchmarkReturns,
+      sofrRates
+    );
+    
+    // 5. Calculate rolling metrics
+    const rollingMetrics = calculateRollingMetrics(
+      data.timeSeriesData.dates.slice(1), // Skip first date (no return)
+      portfolioReturns,
+      benchmarkReturns,
+      sofrRates.slice(1) // Skip first SOFR rate to align with returns
+    );
+    
+    // 6. Update UI
+    renderCharts(data, metrics, rollingMetrics);
+    updateMetricsDisplay(metrics, data);
+    updatePortfolioTable(data);
+    updateDataInfo(data);
+    
+  } catch (error) {
+    console.error("Analysis failed:", error);
+    document.getElementById('ytd-chart').innerHTML = `
+      <div class="error-message">Failed to load data: ${error.message}</div>
+    `;
+  }
+}
+
+// Calculate daily returns from YTD percentages
+function calculateDailyReturnsFromYTD(ytdPercentages) {
+  const returns = [];
+  
+  // Convert percentages to decimal returns (e.g., 10.5% -> 0.105)
+  const ytdDecimals = ytdPercentages.map(p => p / 100);
+  
+  // Calculate daily returns
+  for (let i = 1; i < ytdDecimals.length; i++) {
+    // If previous YTD return was exactly 0, we need special handling to avoid division by zero
+    if (ytdDecimals[i-1] === 0) {
+      returns.push(ytdDecimals[i]); // This day's return is just the YTD return
+    } else {
+      // Formula: daily_return = (1 + ytd_today) / (1 + ytd_yesterday) - 1
+      const dailyReturn = (1 + ytdDecimals[i]) / (1 + ytdDecimals[i-1]) - 1;
+      returns.push(dailyReturn);
+    }
+  }
+  
+  return returns;
+}
+
+// Calculate rolling window metrics
+function calculateRollingMetrics(dates, portfolioReturns, benchmarkReturns, riskFreeRates) {
+  // Initialize arrays to store rolling metrics
+  const rollingAlpha = [];
+  const rollingBeta = [];
+  const rollingInformationRatio = [];
+  
+  // Need at least a full window of data
+  if (portfolioReturns.length < CONFIG.rollingWindow) {
+    return { rollingAlpha, rollingBeta, rollingInformationRatio, rollingDates: [] };
+  }
+  
+  // For each window of data
+  for (let i = CONFIG.rollingWindow; i <= portfolioReturns.length; i++) {
+    // Extract data for the current window
+    const windowPortfolioReturns = portfolioReturns.slice(i - CONFIG.rollingWindow, i);
+    const windowBenchmarkReturns = benchmarkReturns.slice(i - CONFIG.rollingWindow, i);
+    
+    // Use the latest risk-free rate for this window
+    const riskFreeRate = riskFreeRates[i - 1] || riskFreeRates[riskFreeRates.length - 1];
+    
+    // Calculate beta
+    const covar = covariance(windowPortfolioReturns, windowBenchmarkReturns);
+    const benchmarkVariance = variance(windowBenchmarkReturns);
+    const beta = benchmarkVariance !== 0 ? covar / benchmarkVariance : 1.0;
+    
+    // Calculate average returns for window
+    const avgPortfolioReturn = mean(windowPortfolioReturns);
+    const avgBenchmarkReturn = mean(windowBenchmarkReturns);
+    
+    // Calculate alpha for the window (WITHOUT annualizing - just for this window)
+    const alpha = avgPortfolioReturn - (riskFreeRate / CONFIG.tradingDays + beta * (avgBenchmarkReturn - riskFreeRate / CONFIG.tradingDays));
+    
+    // Calculate excess returns for information ratio
+    const excessReturns = windowPortfolioReturns.map((r, idx) => r - windowBenchmarkReturns[idx]);
+    const trackingError = stdDev(excessReturns);
+    
+    // Calculate information ratio for the window
+    const informationRatio = trackingError !== 0 ? 
+      (avgPortfolioReturn - avgBenchmarkReturn) / trackingError : 0;
+    
+    // Store results
+    rollingAlpha.push(alpha * 100); // Convert to percentage
+    rollingBeta.push(beta);
+    rollingInformationRatio.push(informationRatio);
+  }
+  
+  // Extract dates for the rolling metrics
+  // Each date represents the end of a rolling window
+  const rollingDates = dates.slice(CONFIG.rollingWindow - 1);
+  
+  return {
+    rollingAlpha,
+    rollingBeta,
+    rollingInformationRatio,
+    rollingDates
+  };
+}
+
+// Core financial calculations - using actual YTD metrics rather than annualized
+function calculateFinancialMetrics(portfolioReturns, benchmarkReturns, riskFreeRates) {
+  // Safety check
+  if (portfolioReturns.length === 0 || benchmarkReturns.length === 0) {
+    return {
+      alpha: 0,
+      beta: 1.0,
+      sharpeRatio: 0,
+      informationRatio: 0,
+      ytdReturn: 0,
+      correlation: 0
+    };
+  }
+
+  // Calculate cumulative returns - what we actually achieved YTD
+  const cumulativePortfolioReturn = portfolioReturns.reduce((cum, ret) => (1 + cum) * (1 + ret) - 1, 0);
+  const cumulativeBenchmarkReturn = benchmarkReturns.reduce((cum, ret) => (1 + cum) * (1 + ret) - 1, 0);
+  
+  // Average daily risk-free rate
+  const avgRiskFreeRate = mean(riskFreeRates) / CONFIG.tradingDays; // Daily rate
+  
+  // Calculate daily statistics
+  const avgPortfolioReturn = mean(portfolioReturns);
+  const avgBenchmarkReturn = mean(benchmarkReturns);
+  const portStdDev = stdDev(portfolioReturns);
+  const benchStdDev = stdDev(benchmarkReturns);
+  
+  // Calculate beta
+  const portfolioVariance = variance(portfolioReturns);
+  const benchmarkVariance = variance(benchmarkReturns);
+  const covar = covariance(portfolioReturns, benchmarkReturns);
+  
+  // Safety check for division by zero
+  const beta = benchmarkVariance !== 0 ? covar / benchmarkVariance : 1.0;
+  
+  // Calculate YTD alpha (CAPM) - NOT annualized
+  // Using cumulative returns for YTD period
+  const ytdRiskFreeReturn = riskFreeRates.reduce((cum, rate) => 
+    (1 + cum) * (1 + rate / CONFIG.tradingDays) - 1, 0);
+  
+  const alpha = cumulativePortfolioReturn - (ytdRiskFreeReturn + beta * (cumulativeBenchmarkReturn - ytdRiskFreeReturn));
+  
+  // Calculate Sharpe ratio for YTD
+  const excessReturn = cumulativePortfolioReturn - ytdRiskFreeReturn;
+  const sharpeRatio = portStdDev !== 0 ? excessReturn / (portStdDev * Math.sqrt(portfolioReturns.length)) : 0;
+  
+  // Calculate excess returns for information ratio
+  const excessReturns = portfolioReturns.map((r, i) => r - benchmarkReturns[i]);
+  const trackingError = stdDev(excessReturns);
+  
+  // Calculate information ratio
+  const informationRatio = trackingError !== 0 ? 
+    (cumulativePortfolioReturn - cumulativeBenchmarkReturn) / (trackingError * Math.sqrt(portfolioReturns.length)) : 0;
+  
+  // Calculate correlation
+  const correlation = (portStdDev !== 0 && benchStdDev !== 0) ? 
+    covar / (portStdDev * benchStdDev) : 0;
+  
+  return {
+    alpha: alpha,              // YTD alpha
+    beta: beta,                // Beta
+    sharpeRatio: sharpeRatio,  // YTD Sharpe
+    informationRatio: informationRatio, // YTD Information Ratio
+    ytdReturn: cumulativePortfolioReturn,
+    correlation: correlation
+  };
+}
+
+// Statistical helper functions
+function mean(arr) { return arr.reduce((a,b) => a + b, 0) / arr.length; }
+function variance(arr) {
+  const m = mean(arr);
+  return arr.reduce((a,b) => a + Math.pow(b - m, 2), 0) / arr.length;
+}
+function stdDev(arr) { return Math.sqrt(variance(arr)); }
+function covariance(arr1, arr2) {
+  const m1 = mean(arr1), m2 = mean(arr2);
+  let sum = 0;
+  for (let i = 0; i < Math.min(arr1.length, arr2.length); i++) {
+    sum += (arr1[i] - m1) * (arr2[i] - m2);
+  }
+  return sum / Math.min(arr1.length, arr2.length);
+}
+
+// UI Rendering functions
+function renderCharts(data, metrics, rollingMetrics) {
+  // YTD Performance Chart
+  Plotly.newPlot('ytd-chart', [{
+    x: data.timeSeriesData.dates,
+    y: data.timeSeriesData.portfolio,
+    type: 'scatter',
+    mode: 'lines',
+    name: 'Portfolio',
+    line: {
+      color: '#4361ee',
+      width: 3
+    }
+  }, {
+    x: data.timeSeriesData.dates,
+    y: data.timeSeriesData.benchmark,
+    type: 'scatter',
+    mode: 'lines',
+    name: 'S&P 500',
+    line: {
+      color: '#e63946',
+      width: 2,
+      dash: 'dot'
+    }
+  }], {
+    title: 'YTD Performance Comparison',
+    xaxis: {
+      title: 'Date',
+      showgrid: false
+    },
+    yaxis: {
+      title: 'Performance (%)',
+      tickformat: '.1f',
+      showgrid: true,
+      gridcolor: '#f0f0f0',
+      zeroline: true,
+      zerolinecolor: '#aaaaaa'
+    },
+    legend: {
+      orientation: 'h',
+      y: 1.06
+    },
+    hovermode: 'closest',
+    margin: {t: 50, l: 50, r: 10, b: 50},
+    plot_bgcolor: 'white'
+  });
+  
+  // Risk Analysis Chart
+  Plotly.newPlot('risk-chart', [{
+    type: 'bar',
+    x: ['Alpha', 'Beta', 'Sharpe', 'Info Ratio'],
+    y: [metrics.alpha * 100, metrics.beta, metrics.sharpeRatio, metrics.informationRatio],
+    marker: {
+      color: ['#4361ee', '#3a0ca3', '#f72585', '#00b4d8']
+    },
+    text: [
+      (metrics.alpha * 100).toFixed(2) + '%', 
+      metrics.beta.toFixed(2), 
+      metrics.sharpeRatio.toFixed(2),
+      metrics.informationRatio.toFixed(2)
+    ],
+    textposition: 'auto'
+  }], {
+    title: 'YTD Risk Metrics',
+    yaxis: {
+      title: 'Value',
+      showgrid: true,
+      gridcolor: '#f0f0f0',
+      autorange: true,
+      tickformat: '.2f'
+    },
+    margin: {t: 50, l: 50, r: 20, b: 50},
+    plot_bgcolor: 'white'
+  });
+  
+  // Alpha Evolution Chart
+  Plotly.newPlot('alpha-chart', [{
+    x: rollingMetrics.rollingDates,
+    y: rollingMetrics.rollingAlpha,
+    type: 'scatter',
+    mode: 'lines',
+    name: 'Alpha (%)',
+    line: {
+      color: '#4361ee',
+      width: 3
+    },
+    yaxis: 'y'
+  }, {
+    x: rollingMetrics.rollingDates,
+    y: rollingMetrics.rollingInformationRatio,
+    type: 'scatter',
+    mode: 'lines',
+    name: 'Information Ratio',
+    line: {
+      color: '#f72585',
+      width: 2
+    },
+    yaxis: 'y2'
+  }], {
+    title: 'Rolling ' + CONFIG.rollingWindow + '-Day Risk Metrics',
+    xaxis: {
+      title: 'Date',
+      showgrid: false,
+      autorange: true,
+      fixedrange: false // Allow zoom/pan
+    },
+    yaxis: {
+      title: 'Alpha (%)',
+      tickformat: '.2f',
+      showgrid: true,
+      gridcolor: '#f0f0f0',
+      zeroline: true,
+      zerolinecolor: '#aaaaaa',
+      fixedrange: false
+    },
+    yaxis2: {
+      title: 'Information Ratio',
+      titlefont: {color: '#f72585'},
+      tickfont: {color: '#f72585'},
+      overlaying: 'y',
+      side: 'right',
+      showgrid: false,
+      fixedrange: false
+    },
+    legend: {
+      orientation: 'h',
+      y: 1.06 // Adjust positioning if needed
+    },
+    hovermode: 'closest',
+    margin: { t: 50, l: 50, r: 40, b: 50 }, // Changed r from 50 to 20
+    plot_bgcolor: 'white',
+    autosize: true // Ensure autosize is true
+  });
+}
+
+function updateMetricsDisplay(metrics, data) {
+  const portfolioYTD = data.dailySnapshot?.portfolio?.performance || 
+                        data.timeSeriesData.portfolio[data.timeSeriesData.portfolio.length - 1];
+  const benchmarkYTD = data.dailySnapshot?.benchmark?.performance || 
+                        data.timeSeriesData.benchmark[data.timeSeriesData.benchmark.length - 1];
+  
+  // Format alpha as percentage with 2 decimal places
+  const formattedAlpha = (metrics.alpha * 100).toFixed(2) + '%';
+  
+  document.getElementById('performance-metrics').innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">Portfolio YTD</div>
+      <div class="metric-value ${portfolioYTD >= 0 ? 'positive' : 'negative'}">
+        ${portfolioYTD.toFixed(2)}%
+      </div>
+      <div class="metric-description">Current performance</div>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-label">S&P 500 YTD</div>
+      <div class="metric-value ${benchmarkYTD >= 0 ? 'positive' : 'negative'}">
+        ${benchmarkYTD.toFixed(2)}%
+      </div>
+      <div class="metric-description">Benchmark performance</div>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-label">Alpha</div>
+      <div class="metric-value ${metrics.alpha >= 0 ? 'positive' : 'negative'}">
+        ${formattedAlpha}
+      </div>
+      <div class="metric-description">YTD excess return</div>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-label">Beta</div>
+      <div class="metric-value">${metrics.beta.toFixed(2)}</div>
+      <div class="metric-description">Market sensitivity</div>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-label">Information Ratio</div>
+      <div class="metric-value ${metrics.informationRatio >= 0 ? 'positive' : 'negative'}">
+        ${metrics.informationRatio.toFixed(2)}
+      </div>
+      <div class="metric-description">Risk-adjusted relative return</div>
+    </div>
+  `;
+}
+
+function updatePortfolioTable(data) {
+  // Check if we have holdings data
+  if (!data.dailySnapshot?.portfolio?.stocks) {
+    // No table to show
+    document.getElementById('holdings-table-container').innerHTML = '';
+    return;
+  }
+  
+  const stocks = data.dailySnapshot.portfolio.stocks;
+  
+  let tableHTML = `
+    <h3>Portfolio Holdings</h3>
+    <table class="holdings-table">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Weight</th>
+          <th>Price</th>
+          <th>YTD Performance</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  
+  stocks.forEach(stock => {
+    tableHTML += `
+      <tr>
+        <td><strong>${stock.ticker}</strong></td>
+        <td>${(stock.weight * 100).toFixed(2)}%</td>
+        <td>$${stock.price.toFixed(2)}</td>
+        <td class="${stock.ytdChange >= 0 ? 'positive' : 'negative'}">
+          ${stock.ytdChange.toFixed(2)}%
+        </td>
+      </tr>
+    `;
+  });
+  
+  tableHTML += `
+      </tbody>
+    </table>
+  `;
+  
+  document.getElementById('holdings-table-container').innerHTML = tableHTML;
+}
+
+function updateDataInfo(data) {
+  // Show last updated date and SOFR rate information
+  const sofrRate = data.dailySnapshot?.riskFree?.rate || 
+    data.timeSeriesData.sofr_rates_pct[data.timeSeriesData.sofr_rates_pct.length - 1];
+  
+  document.getElementById('data-info').innerHTML = 
+    `Last updated: ${data.lastUpdated || data.timestamp} | Current SOFR Rate: ${sofrRate}%`;
+}
+
+function setupTabSwitching() {
+  const tabs = {
+    'tab-ytd': 'ytd-chart',
+    'tab-risk': 'risk-chart',
+    'tab-alpha': 'alpha-chart'
+  };
+  // Get references to the chart container elements ONCE
+  const chartContainers = {
+    'tab-ytd': document.getElementById('ytd-chart'),
+    'tab-risk': document.getElementById('risk-chart'),
+    'tab-alpha': document.getElementById('alpha-chart')
+  };
+  const alphaNote = document.getElementById('alpha-note'); // Get alpha note element
+
+  Object.keys(tabs).forEach(tabId => {
+    document.getElementById(tabId).addEventListener('click', function() {
+      let newlyVisibleChartElement = null;
+
+      // Deactivate all tabs and hide charts
+      Object.keys(tabs).forEach(id => {
+        document.getElementById(id).classList.remove('active');
+        if (chartContainers[id]) { // Check if element exists
+            chartContainers[id].style.display = 'none';
+        }
+      });
+
+      // Activate selected tab and show chart
+      document.getElementById(tabId).classList.add('active');
+      newlyVisibleChartElement = chartContainers[tabId]; // Get the element for the clicked tab
+      if (newlyVisibleChartElement) {
+        newlyVisibleChartElement.style.display = 'block';
+      }
+
+      // --- ADDED: Explicitly resize the *visible* chart ---
+      if (newlyVisibleChartElement) {
+         try {
+            // Use Plotly.Plots.resize which works on the container div
+            Plotly.Plots.resize(newlyVisibleChartElement);
+            console.log(`Resized chart: ${newlyVisibleChartElement.id}`);
+         } catch (e) {
+             // It might throw an error if the plot isn't fully initialized yet,
+             // especially on the very first load, but should work on subsequent clicks.
+             console.warn(`Could not resize chart ${newlyVisibleChartElement.id} immediately:`, e);
+         }
+      }
+      // --- END ADDED ---
+
+      // Show/hide the alpha chart note based on the active tab
+      if (tabId === 'tab-alpha') {
+          alphaNote.style.display = 'block';
+      } else {
+          alphaNote.style.display = 'none';
+      }
+
+    });
+  });
+
+  // Initial setup: Hide alpha note if alpha tab isn't the default active one on load
+  if (!document.getElementById('tab-alpha').classList.contains('active')) {
+       alphaNote.style.display = 'none';
+   } else {
+       alphaNote.style.display = 'block'; // Ensure it's shown if alpha IS the default
+   }
+}
+
+// Initialize when DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("DOM loaded, starting portfolio analysis...");
+  analyzePortfolio();
+  setupTabSwitching();
+});
+</script>
+
+::: {.callout-note}
+## Key Metrics Explained
+
+- **Alpha**: YTD excess returns after accounting for market risk (positive = outperformance)
+- **Beta**: Measures portfolio volatility relative to market (1 = market risk)
+- **Sharpe Ratio**: Risk-adjusted absolute returns (higher = better)
+- **Information Ratio**: Risk-adjusted relative returns vs benchmark (higher = better)
+- **Rolling Metrics**: Computed using a 20-day rolling window to show evolution over time
+:::
