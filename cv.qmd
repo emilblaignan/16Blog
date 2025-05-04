@@ -12,8 +12,8 @@ As a quantitative finance enthusiast with a focus on fixed-income markets and ma
 </div>
 
 <div style="max-width: 600px; margin: 0 auto; border: 1px solid #dee2e6; border-radius: 5px; overflow: hidden;">
-  <a href="Emil Blaignan Resume UCLA.2.pdf" target="_blank">
-    <img src="Emil Blaignan Resume UCLA.png" alt="CV Preview" style="width: 100%; height: auto;">
+  <a href="Emil Blaignan Resume UCLA (Quant).pdf" target="_blank">
+    <img src="resume.png" alt="CV Preview" style="width: 100%; height: auto;">
   </a>
   <p style="font-size: 0.85rem; color: #6c757d; text-align: center;">
 	  *Click the image to view the full PDF*
@@ -24,7 +24,7 @@ As a quantitative finance enthusiast with a focus on fixed-income markets and ma
   <p>Last updated: April 2025</p>
 
 <div style="text-align: center; margin: 2rem 0;">
-  <a href="Emil Blaignan Resume UCLA.2.pdf" class="btn btn-primary btn-lg" target="_blank">
+  <a href="Emil Blaignan Resume UCLA (Quant).pdf" class="btn btn-primary btn-lg" target="_blank">
     Download Full CV (PDF)
   </a>
 </div>

@@ -16,7 +16,7 @@ about:
 
 ## About Me
 
-Hi, I am a third-year undergraduate student at UCLA majoring in Mathematics/Economics B.S. with a specialization in Computing. My academic interests focus on quantitative finance (fixed-income breadth), machine learning applications in economics, and numerical optimization. I have also worked on projects involving time-series forecasting of Treasury yields, portfolio optimization/risk, and econometric analysis of monetary policy. See the [Projects](projects.qmd) section for more details. I am particularly interested in fixed-income analysis and portfolio management and am keen to see how financial mathematics and deep learning can improve these areas.
+Hi, I am a third-year undergraduate student at UCLA majoring in Mathematics/Economics B.S. with a specialization in Computing. My intellectual pursuits center on quantitative finance (fixed-income breadth), ML-driven macroeconomic forecasting, and numerical optimization. I have also worked on projects involving time-series forecasting of Treasury yields, portfolio optimization/risk, and econometric analysis of monetary policy. See the [Projects](projects.qmd) section for more details. I am particularly interested in fixed-income analysis and portfolio management and am keen to see how financial mathematics and deep learning can improve these areas.
 
 Outside academics, I enjoy photography, hiking, music production, and movies. See the [Personal](personal.qmd) section for more details.
 
