@@ -209,7 +209,7 @@ const CONFIG = {
 async function analyzePortfolio() {
   try {
     // 1. Load data
-    const response = await fetch('data/portfolio-performance.json');
+    const response = await fetch('data/portfolio-performance.json?v=' + new Date().getTime());
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
     const data = await response.json();
     
