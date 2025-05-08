@@ -70,19 +70,34 @@ title-block-banner: true
 
 .metric-card {
   text-align: center;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  padding: 15px 15px 15px 12px;
+  border-radius: 10px; 
+  box-shadow: 0 6px 8px rgba(0,0,0,0.06); 
   background: white;
   position: relative;
   z-index: 25;
   overflow: visible;
+  border-left: 4px solid var(--primary-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease; 
+  transform: translateY(0); 
 }
+
+.metric-card:hover {
+  transform: translateY(-3px); 
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12); 
+}
+
+.metric-card:nth-child(1) { border-left-color: #003366; }
+.metric-card:nth-child(2) { border-left-color: #004D99; }
+.metric-card:nth-child(3) { border-left-color: #0066CC; }
+.metric-card:nth-child(4) { border-left-color: #4394E5; }
+.metric-card:nth-child(5) { border-left-color: #92C5F9; }
 
 .metric-value {
   font-size: 1.8rem;
   font-weight: bold;
   margin: 10px 0;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
 
 .metric-label {
@@ -145,6 +160,103 @@ title-block-banner: true
   border-bottom: 1px solid #eee;
 }
 
+/* New styles for portfolio strategy section */
+.strategy-section {
+  margin-top: 40px;
+}
+
+.strategy-description {
+  padding-top: 18px;
+  padding-right: 25px;
+  padding-bottom: 10px;
+  padding-left: 25px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  line-height: 1.6;
+  border-left: 4px solid var(--primary-color);
+  position: relative;
+  font-size: 1.07rem;
+  color: var(--dark-text);
+}
+
+.strategy-description::before {
+  content: """;
+  position: absolute;
+  top: 5px;
+  left: 15px;
+  font-size: 3.5rem;
+  color: var(--primary-color);
+  opacity: 0.15;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.strategy-description-content {
+  position: relative;
+  padding-left: 10px;
+}
+
+.portfolio-composition {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.composition-chart {
+  height: 500px !important;
+  width: 100% !important;
+}
+
+.strategy-detail-item {
+  margin-bottom: 15px;
+  padding: 15px;
+  border-left: 4px solid var(--primary-color);
+  background-color: var(--light-bg);
+  border-radius: 0 8px 8px 0;
+}
+
+.strategy-detail-item h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: var(--dark-text);
+}
+
+.strategy-detail-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--dark-text);
+}
+
+.portfolio-intro {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--dark-text);
+  max-width: 900px;
+  margin: 0 0 25px 0;
+  padding: 5px 10px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.portfolio-intro::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary-color);
+  border-radius: 3px 0 0 3px;
+}
+
+.portfolio-intro-note {
+  font-style: italic;
+  opacity: 0.85;
+  margin-top: 8px;
+  font-size: 0.95rem;
+}
+
 @media (max-width: 768px) {
   .performance-metrics {
     grid-template-columns: 1fr 1fr;
@@ -153,11 +265,17 @@ title-block-banner: true
   .metric-value {
     font-size: 1.5rem;
   }
+  
+  .portfolio-composition {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 
-This visualization provides a year-to-date analysis of my actively managed investment portfolio's performance, comparing it to the S&P 500 benchmark (SPY).\n
-Portfolio metrics are computed based on a non-annualized framework.
+<div class="portfolio-intro">
+<p>This visualization provides a year-to-date analysis of my actively managed investment portfolio's performance, comparing it to the S&P 500 benchmark (SPY).</p>
+<p class="portfolio-intro-note">Portfolio metrics are computed based on a non-annualized framework.</p>
+</div>
 
 *Note: The data is updated daily via an automated GitHub Action.*
 
@@ -193,6 +311,40 @@ Portfolio metrics are computed based on a non-annualized framework.
 <div id="holdings-table-container">
 <!-- Holdings table will be inserted here -->
 </div>
+
+<!-- Portfolio Strategy Section -->
+<div class="strategy-section">
+<h3>Portfolio Strategy</h3>
+<div class="strategy-description">
+<div class="strategy-description-content">
+This portfolio follows a risk-aware modern approach based on Markowitz mean-variance optimization, seeking to balance risk and return across diverse market conditions. The allocation targets defensive positioning with inflation protection while maintaining exposure to secular growth trends. Periodic rebalancing and factor analysis ensure the portfolio maintains its intended risk characteristics while adapting to changing market dynamics.
+</div>
+</div>
+  
+<div class="portfolio-composition">
+<div>
+<div id="composition-chart" class="composition-chart"></div>
+</div>
+<div>
+<div class="strategy-detail-item">
+<h4>Defensive Core & Inflation Hedge (49.7%)</h4>
+<p>Combines insurance sector exposure (PGR) and gold (IAU) to create a stabilizing core with inflation protection. These assets typically provide downside protection during market stress while offering meaningful appreciation potential.</p>
+</div>
+<div class="strategy-detail-item">
+<h4>Technology & Growth (23.3%)</h4>
+<p>Balanced exposure to established technology leaders (MSFT, NOW) and high-growth semiconductor (NVDA) providing both stability and innovation upside. Position sizing reflects both opportunity and volatility considerations.</p>
+</div>
+<div class="strategy-detail-item">
+<h4>Consumer & Retail Strength (15.2%)</h4>
+<p>Focus on market leaders (WMT, COST) with pricing power that have demonstrated resilience across economic cycles and can pass through inflation to protect margins.</p>
+</div>
+<div class="strategy-detail-item">
+<h4>Financial & Cyclical Exposure (11.8%)</h4>
+<p>Targeted allocation to high-quality financials (JPM) positioned to benefit from interest rate environment and industrial leader (CAT) leveraged to infrastructure and construction activity.</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -203,6 +355,40 @@ Portfolio metrics are computed based on a non-annualized framework.
 const CONFIG = {
   rollingWindow: 20,  // Number of days for rolling window calculations
   tradingDays: 252    // Trading days in a year 
+};
+
+// Define sector classifications and colors for the composition chart
+const SECTORS = {
+  "Defensive Core & Inflation Hedge": {
+    color: "#003366",
+    holdings: {
+      "PGR": { weight: 0.2703},
+      "IAU": { weight: 0.2394}
+    }
+  },
+  "Technology & Growth": {
+    color: "#004D99",
+    holdings: {
+      "NVDA": { weight: 0.1229},
+      "MSFT": { weight: 0.0554},
+      "NOW": { weight: 0.0551},
+      "RDDT": { weight: 0.0385}
+    }
+  },
+  "Consumer & Retail": {
+    color: "#0066CC",
+    holdings: {
+      "WMT": { weight: 0.1109},
+      "COST": { weight: 0.0414}
+    }
+  },
+  "Financial & Cyclical": {
+    color: "#92C5F9",
+    holdings: {
+      "JPM": { weight: 0.0368},
+      "CAT": { weight: 0.0293}
+    }
+  }
 };
 
 // Main analysis function
@@ -243,12 +429,88 @@ async function analyzePortfolio() {
     updatePortfolioTable(data);
     updateDataInfo(data);
     
+    // 7. Create portfolio composition chart
+    renderCompositionChart();
+    
   } catch (error) {
     console.error("Analysis failed:", error);
     document.getElementById('ytd-chart').innerHTML = `
       <div class="error-message">Failed to load data: ${error.message}</div>
     `;
   }
+}
+
+// Function to render the portfolio composition chart
+function renderCompositionChart() {
+  // Prepare data for sunburst chart
+  const labels = ['Portfolio'];
+  const parents = [''];
+  const values = [1]; // Total portfolio is 1 (100%)
+  const hovertext = [''];
+  const colors = ['white']; // Center is white
+
+  // Add sectors and holdings
+  Object.entries(SECTORS).forEach(([sectorName, sectorData]) => {
+    const sectorWeight = Object.values(sectorData.holdings).reduce((sum, h) => sum + h.weight, 0);
+    
+    // Add sector
+    labels.push(sectorName);
+    parents.push('Portfolio');
+    values.push(sectorWeight);
+    hovertext.push(`${(sectorWeight * 100).toFixed(1)}%`);
+    colors.push(sectorData.color);
+    
+    // Add holdings for this sector
+    Object.entries(sectorData.holdings).forEach(([ticker, holding]) => {
+      labels.push(ticker);
+      parents.push(sectorName);
+      values.push(holding.weight);
+      hovertext.push(`${(holding.weight * 100).toFixed(2)}%`);
+      
+      // Use a lighter shade of the sector color
+      const lighterColor = lightenColor(sectorData.color, 30);
+      colors.push(lighterColor);
+    });
+  });
+
+  // Create sunburst chart
+  Plotly.newPlot('composition-chart', [{
+    type: 'sunburst',
+    labels: labels,
+    parents: parents,
+    values: values,
+    text: hovertext,
+    hoverinfo: 'text+label',
+    branchvalues: 'total',
+    marker: {
+      colors: colors,
+      line: { width: 1, color: '#fff' }
+    },
+    textfont: { size: 12 }
+  }], {
+    title: 'Portfolio Composition',
+    margin: { t: 30, l: 0, r: 0, b: 0 },
+    paper_bgcolor: 'rgba(0,0,0,0)'
+  });
+}
+
+// Helper function to lighten a color
+function lightenColor(hex, percent) {
+  // Remove the # if present
+  hex = hex.replace(/^#/, '');
+  
+  // Convert to RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+  
+  // Lighten
+  r = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
+  g = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
+  b = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
+  
+  // Convert back to hex
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
 // Calculate daily returns from YTD percentages
