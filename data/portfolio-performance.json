@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-05-10T02:13:42.345907Z",
-  "lastUpdated": "5/10/2025, 2:13:42 AM",
+  "timestamp": "2025-05-11T02:24:31.671018Z",
+  "lastUpdated": "5/11/2025, 2:24:31 AM",
   "startDate": "2025-01-01",
   "currentDate": "2025-05-09",
   "dailySnapshot": {
     "portfolio": {
-      "performance": 10.35,
+      "performance": 10.38,
       "stocks": [
         {
           "ticker": "PGR",
@@ -59,7 +59,7 @@
           "ticker": "WMT",
           "weight": 0.1109,
           "price": 96.72,
-          "ytdChange": 7.76
+          "ytdChange": 8.02
         },
         {
           "ticker": "RDDT",
@@ -256,7 +256,7 @@
       10.64,
       10.91,
       10.2,
-      10.35
+      10.38
     ],
     "benchmark": [
       1.25,
